@@ -8,8 +8,7 @@ logger = logging.getLogger(__name__)
 
 @app.route('/', methods=['GET'])
 def default_route():
-    return 'Python Template'
-
+    return 'HK - Girl Bosses - submissions'
 
 logger = logging.getLogger()
 handler = logging.StreamHandler()
