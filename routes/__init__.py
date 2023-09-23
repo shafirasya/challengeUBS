@@ -1,6 +1,4 @@
-# import routes.lazydeveloper
-# import routes.airport
-import routes.greedymonkey
+import routes.endPoints
 from flask import Flask
 
 app = Flask(__name__)
