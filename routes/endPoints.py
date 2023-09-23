@@ -3,7 +3,6 @@ import socket
 from routes import app
 from flask import Flask, request, jsonify, json
 from typing import Dict, List
-import re
 
 
 from routes import app
