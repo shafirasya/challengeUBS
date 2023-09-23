@@ -343,29 +343,28 @@ def airport_checkin():
 def maze():
     data = request.get_json()
     logging.info("data sent for evaluation {}".format(data))
-    where_move = move(data)
-    return json.dumps(where_move)
+    next_move = decide_next_move(data)
+    return json.dumps(next_move)
 
-def move(data):
+def decide_next_move(data):
     nearby = data["nearBy"]
-    valid = data["isPreviousMovementValid"]
-    if nearby[1][2] == 3:  # right cell is end cell
-        return "right"
-    elif nearby[2][1] == 3:  # cell below is end cell
-        return "down"
-    elif nearby[1][0] == 3:  # left cell is end cell
-        return "left"
-    elif nearby[0][1] == 3:  # cell above is end cell
-        return "up"
-    elif nearby[1][2] == 1:  # right cell is empty
-        return "right"
-    elif nearby[2][1] == 1:  # cell below is empty
-        return "down"
-    elif nearby[1][0] == 1:  # left cell is empty
-        return "left"
-    elif nearby[0][1] == 1:  # cell above is empty
-        return "up"
-    
-    if valid==False:
+    isPreviousMovementValid = data["isPreviousMovementValid"]
+
+    # Define order of preference for directions
+    directions = ["up", "right", "down", "left"]
+    nearby_values = [
+        nearby[0][1],  # Up
+        nearby[1][2],  # Right
+        nearby[2][1],  # Down
+        nearby[1][0]  # Left
+    ]
+    for direction, value in zip(directions, nearby_values):
+        if value == 3:
+            return direction
+
+    for direction, value in zip(directions, nearby_values):
+        if value == 1:
+            return direction
+    if not isPreviousMovementValid:
         return "respawn"
     return "respawn"
