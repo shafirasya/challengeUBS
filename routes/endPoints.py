@@ -357,38 +357,28 @@ def airport_checkin():
 def maze():
     data = request.get_json()
     logging.info("data sent for evaluation {}".format(data))
-    where_move = move(data)
-    return json.dumps(where_move)
+    result = move(data)
+    logging.info("My result :{}".format(result))
+    return jsonify(result)
 
 def move(data):
-    nearby = data.get("nearBy", [])
-    is_previous_movement_valid = data.get("isPreviousMovementValid", False)
-
-    # Define order of preference for directions
-    directions = ["up", "right", "down", "left"]
-    nearby_values = [
-        nearby[0][1] if len(nearby) > 0 else None,  # Up
-        nearby[1][2] if len(nearby) > 1 else None,  # Right
-        nearby[2][1] if len(nearby) > 2 else None,  # Down
-        nearby[1][0] if len(nearby) > 1 else None  # Left
-    ]
-
-    for direction, value in zip(directions, nearby_values):
-        if value == 3:
-          return {
-            "playerAction": direction
-          }
-
-    for direction, value in zip(directions, nearby_values):
-        if value == 1:
-            return {
-            "playerAction": direction
-          }
-
-    if not is_previous_movement_valid:
-        return {
-            "playerAction": "respawn"
-          }
+    arr = {
+        0: (0, 1), 1: (1, 2), 2: (2, 1), 3: (1, 0)}
+    new_arr = {
+        0: "up", 1: "right", 2: "down", 3: "left"
+    }
+    dir = 2
+    nearby = data['nearby']
+    if nearby[arr[(dir + 1) % 4][0]][arr[(dir + 1) % 4][1]] != 0:
+        dir = (dir + 1) % 4
+    elif nearby[arr[(4 + dir - 1) % 4][0]][arr[(4 + dir - 1) % 4][1]] != 0:
+        dir = (4 + dir - 1) % 4
+    elif nearby[arr[dir][0]][arr[dir][1]] != 0:
+        pass
+    else:
+        dir = (dir + 2) % 4
+    action = new_arr[dir]
+    return {"playerAction": action}
 
     return {"playerAction": "stay"}
 
