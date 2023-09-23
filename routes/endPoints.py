@@ -1,9 +1,10 @@
-import json
 import logging
+import socket
+from routes import app
+from flask import Flask, request, jsonify, json
 from typing import Dict, List
+import re
 
-
-from flask import request, jsonify
 
 from routes import app
 
@@ -233,12 +234,3 @@ def evaluateLazyDeveloper():
     result = getNextProbableWords(classes, statements)
     logging.info("My result :{}".format(result))
     return json.dumps(result)
-
-
-if __name__ == "__main__":
-    logging.info("Starting application ...")
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.bind(('localhost', 8080))
-    port = sock.getsockname()[1]
-    sock.close()
-    app.run(port=port)
