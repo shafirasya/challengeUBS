@@ -94,22 +94,30 @@ def railway_builder():
     logging.info("My result :{}".format(res))
     return json.dumps(result)
 
-def combo(input):
-    results = []
-    for x in input:
-        values = x.split(',')
-        rail_len = int(values[0])
-        track_len = int(values[2])
-        arr = [0] * (rail_len + 1)
-        arr[0] = 1
-        for track in track_len:
-            for i in range(track, rail_len + 1):
-                arr[i] += arr[i - track]
-        results.append(arr[rail_len])
-    return results
+def total_combo(railway_length, track_types, track_lengths):
+    combinations = [[0] * (railway_length + 1) for _ in range(track_types + 1)]
+    combinations[0][0] = 1
 
+    for i in range(1, track_types + 1):
+        combinations[i][0] = 1
 
+        for j in range(1, railway_length + 1):
+            if j < track_lengths[i - 1]:
+                combinations[i][j] = combinations[i - 1][j]
+            else:
+                combinations[i][j] = combinations[i - 1][j] + combinations[i][j - track_lengths[i - 1]]
 
+    return combinations[track_types][railway_length]
+
+def combo(data):
+    result = []
+    for d in data:
+        values = list(map(int, d.split(",")))
+        railway_length = values[0]
+        num_track_types = values[1]
+        track_lengths = values[2:]
+        result.append(total_combo(railway_length, num_track_types, track_lengths))
+    return result
 
 # Digital Colony Solutions
 
