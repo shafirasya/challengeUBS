@@ -82,4 +82,4 @@ def evaluateAirport():
     for item in data:
         arrangedCheckIn = arrangeCheckIn(item)
         results.append(arrangedCheckIn)
-    return jsonify(results)
+    return json.dumps(results)

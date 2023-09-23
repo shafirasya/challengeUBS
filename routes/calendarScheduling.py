@@ -1,3 +1,20 @@
+import json
+import logging
+
+from flask import request, jsonify
+
+from routes import app
+
+logger = logging.getLogger(__name__)
+
+@app.route('/calendar-scheduling', methods=['POST'])
+def calendar_scheduling():
+    data = request.get_json()
+
+    results = schedule_lessons(data)
+
+    return json.dumps(results)
+
 def schedule_lessons(lessonList):
     lesson_requests = lessonList
     

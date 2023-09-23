@@ -86,7 +86,7 @@ def railway_builder():
     data = request.get_json()
     logging.info("data sent for evaluation {}".format(data))
     result = combo(data)
-    logging.info("My result :{}".format(res))
+    logging.info("My result :{}".format(result))
     return json.dumps(result)
 
 def combo(data):
@@ -289,7 +289,7 @@ def digital_colony():
         weight = calculateWeightOverGeneration(colony, generations)
         results.append(weight)
 
-    return jsonify(results)
+    return json.dumps(results)
 
 
 @app.route('/airport', methods=['POST'])
@@ -301,7 +301,7 @@ def airport_checkin():
         arrangedCheckIn = arrangeCheckIn(item)
         results.append(arrangedCheckIn)
 
-    return jsonify(results)
+    return json.dumps(results)
 
 @app.route('/calendar-scheduling', methods=['POST'])
 def calendar_scheduling():
@@ -309,7 +309,7 @@ def calendar_scheduling():
 
     results = schedule_lessons(data)
 
-    return jsonify(results)
+    return json.dumps(results)
 
 @app.route('/maze', methods=['POST'])
 def maze():
@@ -333,13 +333,19 @@ def move(data):
 
     for direction, value in zip(directions, nearby_values):
         if value == 3:
-            return direction
+          return {
+            "playerAction": direction
+          }
 
     for direction, value in zip(directions, nearby_values):
         if value == 1:
-            return direction
+            return {
+            "playerAction": direction
+          }
 
     if not is_previous_movement_valid:
-        return "respawn"
+        return {
+            "playerAction": "respawn"
+          }
 
-    return "stay"
+    return {"playerAction": "stay"}
