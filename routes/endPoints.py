@@ -349,7 +349,7 @@ def maze():
 
 def move(data):
     global new_arr, arr, dir
-   for i in range(4):
+    for i in range(4):
         next_dir = (dir + i) % 4
         if nearby[arr[next_dir][0]][arr[next_dir][1]] != 0:
             dir = next_dir
