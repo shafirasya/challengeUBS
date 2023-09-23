@@ -350,10 +350,6 @@ def maze():
 
 def move(data):
     nearby = data['nearby']
-    valid = data['isPreviousMovementValid']
-    id=data['mazeID']
-    message=data['message']
-    step=data['step']
     for i in range(4):
         if nearby[arr[(dir + i) % 4][0]][arr[(dir + i) % 4][1]] != 0:
             dir = (dir + i) % 4
