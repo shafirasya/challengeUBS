@@ -339,32 +339,46 @@ def airport_checkin():
 
     return json.dumps(results)
 
+
+direction = 2
+mp = {
+    0: (0, 1),  # north
+    1: (1, 2),  # east
+    2: (2, 1),  # south
+    3: (1, 0)  # west
+}
+dir_str = {
+    0: "up", 1: "right", 2: "down", 3: "left"
+}
+
 @app.route('/maze', methods=['POST'])
-def maze():
+def evaluateMaze():
     data = request.get_json()
     logging.info("data sent for evaluation {}".format(data))
-    next_move = decide_next_move(data)
-    return json.dumps(next_move)
+    result = func(data)
+    logging.info("My result :{}".format(result))
+    return jsonify(result)
 
-def decide_next_move(data):
-    nearby = data["nearBy"]
-    isPreviousMovementValid = data["isPreviousMovementValid"]
 
-    # Define order of preference for directions
-    directions = ["up", "right", "down", "left"]
-    nearby_values = [
-        nearby[0][1],  # Up
-        nearby[1][2],  # Right
-        nearby[2][1],  # Down
-        nearby[1][0]  # Left
-    ]
-    for direction, value in zip(directions, nearby_values):
-        if value == 3:
-            return direction
+def func(data):
+    global direction, mp, dir_str
+    mazeId = data['mazeId']
+    nearby = data['nearby']
+    mazeWidth = data['mazeWidth']
+    step = data['step']
+    isPreviousMovementValid = data['isPreviousMovementValid']
+    message = data['message']
 
-    for direction, value in zip(directions, nearby_values):
-        if value == 1:
-            return direction
-    if not isPreviousMovementValid:
-        return "respawn"
-    return "respawn"
+    if nearby[mp[(direction + 1) % 4][0]][mp[(direction + 1) % 4][1]] != 0:
+        direction = (direction + 1) % 4
+        # print("turn right")
+    elif nearby[mp[direction][0]][mp[direction][1]] != 0:
+        # print("forwad")
+        pass
+    elif nearby[mp[(4 + direction - 1) % 4][0]][mp[(4 + direction - 1) % 4][1]] != 0:
+        direction = (4 + direction - 1) % 4
+        # print("turn left")
+    else:
+        direction = (direction + 2) % 4
+        # print("uturn")
+    return {"playerAction": dir_str[direction]}
