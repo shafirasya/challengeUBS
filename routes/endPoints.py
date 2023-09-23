@@ -94,30 +94,28 @@ def railway_builder():
     logging.info("My result :{}".format(res))
     return json.dumps(result)
 
-def total_combo(railway_length, track_types, track_lengths):
-    combinations = [[0] * (railway_length + 1) for _ in range(track_types + 1)]
-    combinations[0][0] = 1
-
-    for i in range(1, track_types + 1):
-        combinations[i][0] = 1
-
-        for j in range(1, railway_length + 1):
-            if j < track_lengths[i - 1]:
-                combinations[i][j] = combinations[i - 1][j]
-            else:
-                combinations[i][j] = combinations[i - 1][j] + combinations[i][j - track_lengths[i - 1]]
-
-    return combinations[track_types][railway_length]
-
 def combo(data):
-    result = []
+    combinations = []
+
     for d in data:
-        values = list(map(int, d.split(",")))
-        railway_length = values[0]
-        num_track_types = values[1]
-        track_lengths = values[2:]
-        result.append(total_combo(railway_length, num_track_types, track_lengths))
-    return result
+        values = d.split(', ')
+        railway_length = int(values[0])
+        num_track_pieces = int(values[1])
+        track_lengths = [int(x) for x in values[2:]]
+        @lru_cache(maxsize=None)
+        def count_combinations(curr_length, idx):
+            if idx == num_track_pieces:
+                if curr_length == railway_length:
+                    return 1
+                else:
+                    return 0
+            total_combinations = 0
+            if curr_length + track_lengths[idx] <= railway_length:
+                total_combinations += count_combinations(curr_length + track_lengths[idx], idx)
+            total_combinations += count_combinations(curr_length, idx + 1)
+            return total_combinations
+        combinations.append(count_combinations(0, 0))
+    return combinations
 
 # Digital Colony Solutions
 
