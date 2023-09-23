@@ -44,22 +44,6 @@ def greedy_monkey():
     total = max_val(max_weight, max_volume, fruits)
     return jsonify(total), 200, {'Content-Type': 'text/plain'}
 
-
-# Example usage
-input_data = {
-    "w": 100,
-    "v": 150,
-    "f": [
-        [60, 70, 60],
-        [30, 80, 40],
-        [35, 70, 70]
-    ]
-}
-
-result = max_val(input_data["w"], input_data["v"], input_data["f"])
-print(result)
-
-
 # Digital Colony Solutions
 
 
@@ -249,3 +233,12 @@ def evaluateLazyDeveloper():
     result = getNextProbableWords(classes, statements)
     logging.info("My result :{}".format(result))
     return json.dumps(result)
+
+
+if __name__ == "__main__":
+    logging.info("Starting application ...")
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.bind(('localhost', 8080))
+    port = sock.getsockname()[1]
+    sock.close()
+    app.run(port=port)
