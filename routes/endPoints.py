@@ -236,3 +236,68 @@ def airport_checkin():
 
 
 
+@app.route('/maze', methods=['POST'])
+def maze():
+    data = request.get_json()
+    logging.info("Data sent for evaluation: %s", data)
+    result = decide_next_move(data)
+    logging.info("My result: %s", result)
+    return jsonify(result)
+
+def decide_next_move(data):
+    nearby = data["nearby"]
+    isPreviousMovementValid = data["isPreviousMovementValid"]
+
+    directions = ["up", "right", "down", "left"]
+    nearby_values = [
+        nearby[0][1],  # Up
+        nearby[1][2],  # Right
+        nearby[2][1],  # Down
+        nearby[1][0]  # Left
+    ]
+    for direction, value in zip(directions, nearby_values):
+        if value == 3:
+            return direction
+    for direction, value in zip(directions, nearby_values):
+        if value == 1:
+            return direction
+    if not isPreviousMovementValid:
+        return "respawn"
+    
+    return solve_maze(data)
+
+
+def solve_maze(data):
+    maze_width = data["mazeWidth"]
+    nearby = data["nearby"]
+    spawn_position = find_spawn_position(nearby)
+    end_position = find_end_position(nearby)
+    
+    if spawn_position == end_position:
+        return "respawn"
+    if spawn_position[0] > end_position[0]:
+        return "up"
+    elif spawn_position[0] < end_position[0]:
+        return "down"
+    elif spawn_position[1] > end_position[1]:
+        return "left"
+    elif spawn_position[1] < end_position[1]:
+        return "right"
+    else:
+        return "stay"
+
+
+def find_spawn_position(nearby):
+    for i in range(3):
+        for j in range(3):
+            if nearby[i][j] == 2:
+                return (i, j)
+    return None
+
+
+def find_end_position(nearby):
+    for i in range(3):
+        for j in range(3):
+            if nearby[i][j] == 3:
+                return (i, j)
+    return None
