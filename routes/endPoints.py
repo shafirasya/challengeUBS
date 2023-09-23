@@ -86,6 +86,28 @@ def calculate_maximum_value(weight_limit, value_limit, items):
 
     return dynamic_programming(0, 0, 0)
 
+def combo(input):
+    results = []
+    for x in input:
+        values = x.split(',')
+        rail_len = int(values[0])
+        track_len = int(values[2])
+        arr = [0] * (rail_len + 1)
+        arr[0] = 1
+        for track in track_len:
+            for i in range(track, rail_len + 1):
+                arr[i] += arr[i - track]
+        results.append(arr[rail_len])
+    return results
+
+@app.route('/railway-builder', methods=['POST'])
+def evaluateRailwayBuilder():
+    data = request.get_json()
+    logging.info("data sent for evaluation {}".format(data))
+    result = func(data)
+    logging.info("My result :{}".format(result))
+    return json.dumps(result)
+
 
 # Digital Colony Solutions
 
