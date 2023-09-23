@@ -160,11 +160,14 @@ def schedule_lessons(lessonList):
 
 # Digital Colony Solutions
 
-def calculateWeightOverGeneration(colony, generation):
+def calculateWeightOverGeneration(item):
+    generations = item['generations']
+    colony = item['colony']
+
     # Convert colony to a list of digits
     colony_digits = list(map(int, str(colony)))
 
-    for gen in range(generation):
+    for gen in range(generations):
         currentGenWeight = sum(colony_digits)
 
         # Initialize a new colony list
@@ -195,8 +198,6 @@ def calculateWeightOverGeneration(colony, generation):
 
     # Calculate the weight of the final colony
     finalcolonyWeight = sum(colony_digits)
-
-    print(finalcolonyWeight)
 
     return str(finalcolonyWeight)
 
@@ -326,13 +327,11 @@ def square():
 def digital_colony():
     logging.info('enter digital colony')
     data = request.get_json()
-    print
+    logging.info("data sent for evaluation {}".format(data))
 
     results = []
     for item in data:
-        generations = item["generations"]
-        colony = item["colony"]
-        weight = calculateWeightOverGeneration(colony, generations)
+        weight = calculateWeightOverGeneration(item)
         results.append(weight)
 
     return json.dumps(results)
