@@ -341,7 +341,6 @@ def airport_checkin():
 
 @app.route('/maze', methods=['POST'])
 def maze():
-    global arr, dir, new_arr
     data = request.get_json()
     logging.info("data sent for evaluation {}".format(data))
     result = move(data)
@@ -349,6 +348,7 @@ def maze():
     return jsonify(result)
 
 def move(data):
+    global arr, dir, new_arr
     nearby = data['nearby']
     for i in range(4):
         if nearby[arr[(dir + i) % 4][0]][arr[(dir + i) % 4][1]] != 0:
