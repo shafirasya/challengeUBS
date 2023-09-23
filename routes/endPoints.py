@@ -347,33 +347,30 @@ def maze():
     return json.dumps(where_move)
 
 def move(data):
-    nearby = data.get("nearBy", [])
-    is_previous_movement_valid = data.get("isPreviousMovementValid", False)
+    nearby = data["nearby"]
+    status = data.get("message", "")
+    if nearby[1][1] == 3:  
+        return
+    if status == "finished":
+        return
+    action = find_next_movement(nearby)
 
-    # Define order of preference for directions
-    directions = ["up", "right", "down", "left"]
-    nearby_values = [
-        nearby[0][1] if len(nearby) > 0 else None,  # Up
-        nearby[1][2] if len(nearby) > 1 else None,  # Right
-        nearby[2][1] if len(nearby) > 2 else None,  # Down
-        nearby[1][0] if len(nearby) > 1 else None  # Left
-    ]
-
-    for direction, value in zip(directions, nearby_values):
-        if value == 3:
-          return {
-            "playerAction": direction
-          }
-
-    for direction, value in zip(directions, nearby_values):
-        if value == 1:
-            return {
-            "playerAction": direction
-          }
-
-    if not is_previous_movement_valid:
-        return {
-            "playerAction": "respawn"
-          }
-
-    return {"playerAction": "stay"}
+def find_next_movement(nearby):
+    if nearby[1][1] == 3:  # end cell
+        return ""
+    elif nearby[1][2] == 3:  # right cell is end cell
+        return "right"
+    elif nearby[2][1] == 3:  # cell below is end cell
+        return "down"
+    elif nearby[1][0] == 3:  # left cell is end cell
+        return "left"
+    elif nearby[0][1] == 3:  # cell above is end cell
+        return "up"
+    elif nearby[1][2] == 1:  # right cell is empty
+        return "right"
+    elif nearby[2][1] == 1:  # cell below is empty
+        return "down"
+    elif nearby[1][0] == 1:  # left cell is empty
+        return "left"
+    elif nearby[0][1] == 1:  # cell above is empty
+        return "up"
