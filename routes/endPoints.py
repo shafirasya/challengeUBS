@@ -9,7 +9,15 @@ from routes import app
 
 logger = logging.getLogger(__name__)
 
-from typing import Dict, List
+@app.route('/lazy-developer', methods=['POST'])
+def evaluateLazyDeveloper():
+    data = request.get_json()
+    logging.info("data sent for evaluation {}".format(data))
+    classes = data['classes']
+    statements = data['statements']
+    result = getNextProbableWords(classes, statements)
+    logging.info("My result :{}".format(result))
+    return json.dumps(result)
 
 def getNextProbableWords(classes: List[Dict], statements: List[str]) -> Dict[str, List[str]]:
     result = {}
@@ -43,15 +51,7 @@ def getNextProbableWords(classes: List[Dict], statements: List[str]) -> Dict[str
     return result
 
 
-@app.route('/lazy-developer', methods=['POST'])
-def evaluateLazyDeveloper():
-    data = request.get_json()
-    logging.info("data sent for evaluation {}".format(data))
-    classes = data['classes']
-    statements = data['statements']
-    result = getNextProbableWords(classes, statements)
-    logging.info("My result :{}".format(result))
-    return json.dumps(result)
+
 
 
 @app.route('/greedymonkey', methods=['POST'])
@@ -86,6 +86,14 @@ def calculate_maximum_value(weight_limit, value_limit, items):
 
     return dynamic_programming(0, 0, 0)
 
+@app.route("/railway-builder", methods=['POST'])
+def railway_builder():
+    data = request.get_json()
+    logging.info("data sent for evaluation {}".format(data))
+    result = combo(data)
+    logging.info("My result :{}".format(res))
+    return json.dumps(result)
+
 def combo(input):
     results = []
     for x in input:
@@ -100,13 +108,7 @@ def combo(input):
         results.append(arr[rail_len])
     return results
 
-@app.route('/railway-builder', methods=['POST'])
-def evaluateRailwayBuilder():
-    data = request.get_json()
-    logging.info("data sent for evaluation {}".format(data))
-    result = func(data)
-    logging.info("My result :{}".format(result))
-    return json.dumps(result)
+
 
 
 # Digital Colony Solutions
