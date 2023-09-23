@@ -1,4 +1,4 @@
-import routes.endPoints
 from flask import Flask
 
 app = Flask(__name__)
+import routes.endPoints
