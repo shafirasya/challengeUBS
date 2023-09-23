@@ -348,10 +348,10 @@ def maze():
     return jsonify(result)
 
 def move(data):
-    global arr, dir, new_arr
+    global mp, dir, new_arr
     nearby = data['nearby']
     for i in range(4):
-        if nearby[arr[(dir + i) % 4][0]][arr[(dir + i) % 4][1]] != 0:
+        if nearby[mp[(dir + i) % 4][0]][mp[(dir + i) % 4][1]] != 0:
             dir = (dir + i) % 4
             break
     action = new_arr[dir]
