@@ -349,14 +349,6 @@ def airport_checkin():
 
     return json.dumps(results)
 
-@app.route('/calendar-scheduling', methods=['POST'])
-def calendar_scheduling():
-    data = request.get_json()
-
-    results = schedule_lessons(data)
-
-    return json.dumps(results)
-
 @app.route('/maze', methods=['POST'])
 def maze():
     data = request.get_json()
