@@ -59,23 +59,30 @@ def evaluateGreedyMonkey():
     w = data['w']
     v = data['v']
     f = data['f']
-    result = func(w, v, f)
+    result = calculate_maximum_value(w, v, f)
     logging.info("My result :{}".format(result))
     return json.dumps(result)
 
 
-def func(w, v, f):
-    @lru_cache(maxsize=None)
-    def dp(curr_w, curr_v, idx):
-        if idx == len(f):
-            return 0
-        maxi = 0
-        if curr_w + f[idx][0] <= w and curr_v + f[idx][1] <= v:
-            maxi = max(maxi, f[idx][2] + dp(curr_w + f[idx][0], curr_v + f[idx][1], idx + 1))
-        maxi = max(maxi, dp(curr_w, curr_v, idx + 1))
-        return maxi
+def calculate_maximum_value(weight_limit, value_limit, items):
+    memo = {}
 
-    return dp(0, 0, 0)
+    def dynamic_programming(curr_weight, curr_value, index):
+        if index == len(items):
+            return 0
+
+        if (curr_weight, curr_value, index) in memo:
+            return memo[(curr_weight, curr_value, index)]
+
+        max_value = 0
+        if curr_weight + items[index][0] <= weight_limit and curr_value + items[index][1] <= value_limit:
+            max_value = max(max_value, items[index][2] + dynamic_programming(curr_weight + items[index][0], curr_value + items[index][1], index + 1))
+        max_value = max(max_value, dynamic_programming(curr_weight, curr_value, index + 1))
+
+        memo[(curr_weight, curr_value, index)] = max_value
+        return max_value
+
+    return dynamic_programming(0, 0, 0)
 
 
 # Digital Colony Solutions
