@@ -350,13 +350,10 @@ def maze():
 def move(data):
     global direction, mp, dir_str
     n = data['nearby']
-    next_direction = (direction + 1) % 4
-    prev_direction = (4 + direction - 1) % 4
-
-    if n[mp[next_direction][0]][mp[next_direction][1]] != 0:
-        direction = next_direction
-    elif n[mp[prev_direction][0]][mp[prev_direction][1]] != 0:
-        direction = prev_direction
+    if n[mp[(direction + 1) % 4][0]][mp[(direction + 1) % 4][1]] != 0:
+        direction = (direction + 1) % 4
+    elif n[mp[(4 + direction - 1) % 4][0]][mp[(4 + direction - 1) % 4][1]] != 0:
+        direction = (4 + direction - 1) % 4
     elif n[mp[direction][0]][mp[direction][1]] != 0:
         pass
     else:
