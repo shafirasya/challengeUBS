@@ -240,88 +240,31 @@ def airport_checkin():
 def maze():
     data = request.get_json()
     logging.info("Data sent for evaluation: %s", data)
-    result = decide_next_move(data)
+    result = move(data)
     logging.info("My result: %s", result)
     return jsonify(result)
 
-def decide_next_move(data):
-    nearby = data["nearby"]
-    isPreviousMovementValid = data["isPreviousMovementValid"]
+def move(data):
+    nb = data["nearBy"]
+    is_prev_move_valid = data["isPreviousMovementValid"]
 
-    spawn_position = find_spawn_position(nearby)
-    end_position = find_end_position(nearby)
+    dirs = ["up", "right", "down", "left"]
+    nb_values = [
+        nb[0][1],
+        nb[1][2],
+        nb[2][1],
+        nb[1][0]
+    ]
 
-    if spawn_position is None or end_position is None:
-        return "stay"
-    
-    # Implement maze-solving algorithm to find shortest path
-    path = solve_maze(nearby, spawn_position, end_position)
+    for d, v in zip(dirs, nb_values):
+        if v == 3:
+            return d
 
-    if not isPreviousMovementValid:
+    for d, v in zip(dirs, nb_values):
+        if v == 1:
+            return d
+
+    if not is_prev_move_valid:
         return "respawn"
 
-    if path:
-        return path[0]
-    else:
-        return "stay"
-
-
-def find_spawn_position(nearby):
-    for i in range(3):
-        for j in range(3):
-            if nearby[i][j] == 2:
-                return (i, j)
-    return None
-
-
-def find_end_position(nearby):
-    for i in range(3):
-        for j in range(3):
-            if nearby[i][j] == 3:
-                return (i, j)
-    return None
-
-
-def solve_maze(nearby, start, end):
-    visited = set()
-    queue = [[start]]
-
-    while queue:
-        path = queue.pop(0)
-        current_position = path[-1]
-
-        if current_position == end:
-            return path[1:]  # Exclude the starting position from the path
-
-        if current_position in visited:
-            continue
-
-        visited.add(current_position)
-
-        # Define order of preference for directions
-        directions = ["up", "right", "down", "left"]
-        nearby_values = [
-            nearby[current_position[0] - 1][current_position[1]],  # Up
-            nearby[current_position[0]][current_position[1] + 1],  # Right
-            nearby[current_position[0] + 1][current_position[1]],  # Down
-            nearby[current_position[0]][current_position[1] - 1]  # Left
-        ]
-
-        for direction, value in zip(directions, nearby_values):
-            if value == 1 or value == 3:
-                new_position = get_new_position(current_position, direction)
-                new_path = path + [direction]
-                queue.append(new_path)
-
-    return []
-
-
-def get_new_position(position, direction):
-    if direction == "up":
-        return (position[0] - 1, position[1])
-    elif direction == "right":
-        return (position[0], position[1] + 1)
-    elif direction == "down":
-        return (position[0] + 1, position[1])
-    elif direction == "left":
-        return (position[0], position[1] - 1)
+    return "stay"
