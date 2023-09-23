@@ -3,7 +3,7 @@ import socket
 from routes import app
 from flask import Flask, request, jsonify, json
 from typing import Dict, List
-rom functools import lru_cache
+from functools import lru_cache
 
 from routes import app
 
