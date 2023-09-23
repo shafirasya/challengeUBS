@@ -348,11 +348,12 @@ def maze():
     return jsonify(result)
 
 def move(data):
-    global new_arr, arr, dir
-    for i in range(4):
-        next_dir = (dir + i) % 4
-        if nearby[arr[next_dir][0]][arr[next_dir][1]] != 0:
-            dir = next_dir
-            break
-    action = new_arr[dir]
-    return {"playerAction": action}
+    if nearby[mp[(direction + 1) % 4][0]][mp[(direction + 1) % 4][1]] != 0:
+        direction = (direction + 1) % 4
+    elif nearby[mp[direction][0]][mp[direction][1]] != 0:
+        pass
+    elif nearby[mp[(4 + direction - 1) % 4][0]][mp[(4 + direction - 1) % 4][1]] != 0:
+        direction = (4 + direction - 1) % 4
+    else:
+        direction = (direction + 2) % 4
+    return {"playerAction": dir_str[direction]}
