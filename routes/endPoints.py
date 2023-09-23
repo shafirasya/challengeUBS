@@ -339,46 +339,24 @@ def airport_checkin():
 
     return json.dumps(results)
 
-
-direction = 2
-mp = {
-    0: (0, 1),  # north
-    1: (1, 2),  # east
-    2: (2, 1),  # south
-    3: (1, 0)  # west
-}
-dir_str = {
-    0: "up", 1: "right", 2: "down", 3: "left"
-}
-
 @app.route('/maze', methods=['POST'])
-def evaluateMaze():
+def maze():
+    global arr, dir, new_arr
     data = request.get_json()
     logging.info("data sent for evaluation {}".format(data))
-    result = func(data)
+    result = move(data)
     logging.info("My result :{}".format(result))
     return jsonify(result)
 
-
-def func(data):
-    global direction, mp, dir_str
-    mazeId = data['mazeId']
+def move(data):
     nearby = data['nearby']
-    mazeWidth = data['mazeWidth']
-    step = data['step']
-    isPreviousMovementValid = data['isPreviousMovementValid']
-    message = data['message']
-
-    if nearby[mp[(direction + 1) % 4][0]][mp[(direction + 1) % 4][1]] != 0:
-        direction = (direction + 1) % 4
-        # print("turn right")
-    elif nearby[mp[direction][0]][mp[direction][1]] != 0:
-        # print("forwad")
-        pass
-    elif nearby[mp[(4 + direction - 1) % 4][0]][mp[(4 + direction - 1) % 4][1]] != 0:
-        direction = (4 + direction - 1) % 4
-        # print("turn left")
-    else:
-        direction = (direction + 2) % 4
-        # print("uturn")
-    return {"playerAction": dir_str[direction]}
+    valid = data['isPreviousMovementValid']
+    id=data['mazeID']
+    message=data['message']
+    step=data['step']
+    for i in range(4):
+        if nearby[arr[(dir + i) % 4][0]][arr[(dir + i) % 4][1]] != 0:
+            dir = (dir + i) % 4
+            break
+    action = new_arr[dir]
+    return {"playerAction": action}
