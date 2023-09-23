@@ -347,7 +347,7 @@ def maze():
     return json.dumps(where_move)
 
 def move(data):
-    nearby = data["nearby"]
+    nearby = data["nearBy"]
     valid = data["isPreviousMovementValid"]
     if nearby[1][2] == 3:  # right cell is end cell
         return "right"
