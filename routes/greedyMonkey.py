@@ -1,3 +1,25 @@
+import json
+import logging
+
+from flask import request
+
+from routes import app
+
+logger = logging.getLogger(__name__)
+
+
+@app.route('/greedymonkey', methods=['POST'])
+def evaluateGreedyMonkey():
+    data = request.get_json()
+    logging.info("data sent for evaluation {}".format(data))
+    w = data['w']
+    v = data['v']
+    f = data['f']
+    result = max_val(w, v, f)
+    logging.info("My result :{}".format(result))
+    return json.dumps(result)
+
+
 def max_val(w, v, f):
     num = len(f)  # number of fruits in f
     # 3d array (dim: num of fruits x max weight x max volume)
@@ -18,16 +40,3 @@ def max_val(w, v, f):
                     arr[i + 1][j][k] = arr[i][j][k]
 
     return arr[num][w][v]
-
-
-@app.route('/greedymonkey', methods=['POST'])
-def greedy_monkey():
-    data = request.get_data()
-    data = json.loads(data)
-    print(data)
-    max_weight = data["w"]
-    max_volume = data["v"]
-    fruits = data["f"]
-
-    total = max_val(max_weight, max_volume, fruits)
-    return jsonify(total), 200, {'Content-Type': 'text/plain'}
