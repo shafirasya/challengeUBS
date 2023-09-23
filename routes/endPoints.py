@@ -245,26 +245,27 @@ def maze():
     return jsonify(result)
 
 def move(data):
-    nb = data["nearBy"]
-    is_prev_move_valid = data["isPreviousMovementValid"]
+    nearby = data.get("nearBy", [])
+    is_previous_movement_valid = data.get("isPreviousMovementValid", False)
 
-    dirs = ["up", "right", "down", "left"]
-    nb_values = [
-        nb[0][1],
-        nb[1][2],
-        nb[2][1],
-        nb[1][0]
+    # Define order of preference for directions
+    directions = ["up", "right", "down", "left"]
+    nearby_values = [
+        nearby[0][1] if len(nearby) > 0 else None,  # Up
+        nearby[1][2] if len(nearby) > 1 else None,  # Right
+        nearby[2][1] if len(nearby) > 2 else None,  # Down
+        nearby[1][0] if len(nearby) > 1 else None  # Left
     ]
 
-    for d, v in zip(dirs, nb_values):
-        if v == 3:
-            return d
+    for direction, value in zip(directions, nearby_values):
+        if value == 3:
+            return direction
 
-    for d, v in zip(dirs, nb_values):
-        if v == 1:
-            return d
+    for direction, value in zip(directions, nearby_values):
+        if value == 1:
+            return direction
 
-    if not is_prev_move_valid:
+    if not is_previous_movement_valid:
         return "respawn"
 
     return "stay"
