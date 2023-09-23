@@ -348,6 +348,7 @@ def maze():
     return jsonify(result)
 
 def move(data):
+    nearby=data['nearBy']
     if nearby[mp[(direction + 1) % 4][0]][mp[(direction + 1) % 4][1]] != 0:
         direction = (direction + 1) % 4
     elif nearby[mp[direction][0]][mp[direction][1]] != 0:
