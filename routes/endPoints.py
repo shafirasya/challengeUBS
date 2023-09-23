@@ -106,6 +106,53 @@ def arrangeCheckIn(testCase):
         "numberOfRequests": result['total_number_of_requests']
     }
 
+# Calendar Scheduling Solution
+
+def schedule_lessons(lessonList):
+    lesson_requests = lessonList
+    
+    # Sort the lesson requests in descending order of potential earnings
+    lesson_requests.sort(key=lambda x: x['potentialEarnings'], reverse=True)
+    
+    # Initialize the schedule dictionary
+    schedule = {}
+    
+    # Initialize the total earnings
+    total_earnings = 0
+
+    # Map to track duration per day
+    durationPerDay = {}
+    
+    # Iterate over the lesson requests
+    for lesson_request in lesson_requests:
+        lesson_id = lesson_request['lessonRequestId']
+        duration = lesson_request['duration']
+        earnings = lesson_request['potentialEarnings']
+        available_days = lesson_request['availableDays']
+
+        # If duration already exceed, exclude
+        if duration > 12:
+            continue
+
+        # Find the first available day with enough hours for the lesson
+        scheduled_day = None
+        for day in available_days:
+            if day not in schedule:
+                schedule[day] = []
+                durationPerDay[day] = 0
+            if durationPerDay[day] + duration <= 12:
+                scheduled_day = day
+                break
+        
+        # Schedule the lesson if an available day is found
+        if scheduled_day is not None:
+            schedule[scheduled_day].append(lesson_id)
+            durationPerDay[scheduled_day] += duration
+            total_earnings += earnings
+    
+    # Return the schedule and total earnings as the response
+    return schedule
+
 @app.route('/square', methods=['POST'])
 def square():
    logging.info('entering square..')
@@ -137,5 +184,13 @@ def airport_checkin():
     for item in data:
         arrangedCheckIn = arrangeCheckIn(item)
         results.append(arrangedCheckIn)
+
+    return jsonify(results)
+
+@app.route('/calendar-scheduling', methods=['POST'])
+def calendar_scheduling():
+    data = request.get_json()
+
+    results = schedule_lessons(data)
 
     return jsonify(results)
