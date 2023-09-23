@@ -348,17 +348,8 @@ def maze():
 
 def move(data):
     nearby = data["nearby"]
-    status = data.get("message", "")
-    if nearby[1][1] == 3:  
-        return
-    if status == "finished":
-        return
-    action = find_next_movement(nearby)
-
-def find_next_movement(nearby):
-    if nearby[1][1] == 3:  # end cell
-        return ""
-    elif nearby[1][2] == 3:  # right cell is end cell
+    valid = data["isPreviousMoveValid"]
+    if nearby[1][2] == 3:  # right cell is end cell
         return "right"
     elif nearby[2][1] == 3:  # cell below is end cell
         return "down"
@@ -374,3 +365,7 @@ def find_next_movement(nearby):
         return "left"
     elif nearby[0][1] == 1:  # cell above is empty
         return "up"
+    
+    if valid==False:
+        return "respawn"
+    return "respawn"
