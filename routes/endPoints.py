@@ -239,10 +239,9 @@ def airport_checkin():
 @app.route('/maze', methods=['POST'])
 def maze():
     data = request.get_json()
-    logging.info("Data sent for evaluation: %s", data)
-    result = move(data)
-    logging.info("My result: %s", result)
-    return jsonify(result)
+    logging.info("data sent for evaluation {}".format(data))
+    where_move = move(data)
+    return json.dumps(where_move)
 
 def move(data):
     nearby = data.get("nearBy", [])
