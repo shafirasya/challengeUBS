@@ -348,7 +348,7 @@ def maze():
 
 def move(data):
     nearby = data["nearby"]
-    valid = data["isPreviousMoveValid"]
+    valid = data["isPreviousMovementValid"]
     if nearby[1][2] == 3:  # right cell is end cell
         return "right"
     elif nearby[2][1] == 3:  # cell below is end cell
