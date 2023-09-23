@@ -1,4 +1,4 @@
-import routes.endPoints
+import routes.greedymonkey
 from flask import Flask
 
 app = Flask(__name__)
