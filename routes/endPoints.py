@@ -3,46 +3,80 @@ import socket
 from routes import app
 from flask import Flask, request, jsonify, json
 from typing import Dict, List
-
+rom functools import lru_cache
 
 from routes import app
 
 logger = logging.getLogger(__name__)
 
+def getNextProbableWords(classes: List[Dict],
+                         statements: List[str]) -> Dict[str, List[str]]:
+    # Fill in your solution here and return the correct output based on the given input
+    result = {}
+    cdict = {k: v for ci in classes for k, v in ci.items()}
+    for x in statements:
+        result[x] = []
+        l = x.split('.')
+        first_sub = l[0]
+        second_sub = l[1]
+        if (first_sub in cdict.keys()):
+            if type(cdict[first_sub]) == dict and second_sub != "":
+                klist = cdict[first_sub].keys()
+                for j in klist:
+                    if (j.find(second_sub) != -1):
+                        if (cdict[first_sub][j][:4] != 'List'):
+                            result[x] += [j]
+            else:
+                klist = cdict[first_sub]
+                for j in klist:
+                    if (j.find(second_sub) != -1):
+                        result[x] += [j]
+        result[x].sort()
+        if result[x] == []:
+            result[x] = ['']
+        final = result[x]
+        if (len(final) > 5):
+            result[x] = final[:5]
+    # print(result)
+    return result
 
-def max_val(w, v, f):
-    num = len(f)  # number of fruits in f
-    # 3d array (dim: num of fruits x max weight x max volume)
-    arr = [[[0] * (v + 1) for x in range(w + 1)] for y in range(num + 1)]
-    # arr stores max fruit value for diff val of fruit, weight, and vol
-    # initialise arr with 0s
 
-    for i in range(num):  # iterate through fruits in f
-        weight = f[i][0]  # get weight
-        volume = f[i][1]  # get volume
-        value = f[i][2]  # get value of fruit
-        for j in range(1, w + 1):
-            for k in range(1, v + 1):
-                if weight <= j and volume <= k:  # current fruit's val of weight and volume less than j and k
-                    arr[i + 1][j][k] = max(arr[i][j][k],
-                                           arr[i][j - weight][k - volume] + value)
-                else:
-                    arr[i + 1][j][k] = arr[i][j][k]
-
-    return arr[num][w][v]
+@app.route('/lazy-developer', methods=['POST'])
+def evaluateLazyDeveloper():
+    data = request.get_json()
+    logging.info("data sent for evaluation {}".format(data))
+    classes = data['classes']
+    statements = data['statements']
+    result = getNextProbableWords(classes, statements)
+    logging.info("My result :{}".format(result))
+    return json.dumps(result)
 
 
 @app.route('/greedymonkey', methods=['POST'])
-def greedy_monkey():
-    data = request.get_data()
-    data = json.loads(data)
-    print(data)
-    max_weight = data["w"]
-    max_volume = data["v"]
-    fruits = data["f"]
+def evaluateGreedyMonkey():
+    data = request.get_json()
+    logging.info("data sent for evaluation {}".format(data))
+    w = data['w']
+    v = data['v']
+    f = data['f']
+    result = func(w, v, f)
+    logging.info("My result :{}".format(result))
+    return json.dumps(result)
 
-    total = max_val(max_weight, max_volume, fruits)
-    return jsonify(total), 200, {'Content-Type': 'text/plain'}
+
+def func(w, v, f):
+    @lru_cache(maxsize=None)
+    def dp(curr_w, curr_v, idx):
+        if idx == len(f):
+            return 0
+        maxi = 0
+        if curr_w + f[idx][0] <= w and curr_v + f[idx][1] <= v:
+            maxi = max(maxi, f[idx][2] + dp(curr_w + f[idx][0], curr_v + f[idx][1], idx + 1))
+        maxi = max(maxi, dp(curr_w, curr_v, idx + 1))
+        return maxi
+
+    return dp(0, 0, 0)
+
 
 # Digital Colony Solutions
 
@@ -192,44 +226,4 @@ def airport_checkin():
     return jsonify(results)
 
 
-def getNextProbableWords(classes: List[Dict],
-                         statements: List[str]) -> Dict[str, List[str]]:
-    # Fill in your solution here and return the correct output based on the given input
-    result = {}
-    cdict = {k: v for ci in classes for k, v in ci.items()}
-    for x in statements:
-        result[x] = []
-        l = x.split('.')
-        first_sub = l[0]
-        second_sub = l[1]
-        if (first_sub in cdict.keys()):
-            if type(cdict[first_sub]) == dict and second_sub != "":
-                klist = cdict[first_sub].keys()
-                for j in klist:
-                    if (j.find(second_sub) != -1):
-                        if (cdict[first_sub][j][:4] != 'List'):
-                            result[x] += [j]
-            else:
-                klist = cdict[first_sub]
-                for j in klist:
-                    if (j.find(second_sub) != -1):
-                        result[x] += [j]
-        result[x].sort()
-        if result[x] == []:
-            result[x] = ['']
-        final = result[x]
-        if (len(final) > 5):
-            result[x] = final[:5]
-    # print(result)
-    return result
 
-
-@app.route('/lazy-developer', methods=['POST'])
-def evaluateLazyDeveloper():
-    data = request.get_json()
-    logging.info("data sent for evaluation {}".format(data))
-    classes = data['classes']
-    statements = data['statements']
-    result = getNextProbableWords(classes, statements)
-    logging.info("My result :{}".format(result))
-    return json.dumps(result)
