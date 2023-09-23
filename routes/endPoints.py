@@ -159,47 +159,42 @@ def schedule_lessons(lessonList):
 
 
 # Digital Colony Solutions
+def calculateWeightOverGeneration(data):
+    results = []
+    for item in data:
+        generations = item['generations']
+        colony = item['colony']
 
-def calculateWeightOverGeneration(item):
-    generations = item['generations']
-    colony = item['colony']
+        pair = [[i - j if i >= j else i + 10 - j for j in range(10)] for i in range(10)]
 
-    # Convert colony to a list of digits
-    colony_digits = list(map(int, str(colony)))
+        cpair = [[0 for j in range(10)] for i in range(10)]
+        s = [0 for i in range(10)]
 
-    for gen in range(generations):
-        currentGenWeight = sum(colony_digits)
+        c = [int(i) for i in colony]
 
-        # Initialize a new colony list
-        new_colony = []
+        for i in range(len(c) - 1):
+            cpair[c[i]][c[i + 1]] += 1
+        for i in range(len(c)):
+            s[c[i]] += 1
+        tot = 0
+        for i in range(51):
+            total = sum([s[j] * j for j in range(10)])
+            if i == generations:
+                tot = total
+                break
+            tmpair = [[0 for k in range(10)] for j in range(10)]
+            mod = total % 10
+            for j in range(10):
+                for k in range(10):
+                    if cpair[j][k] > 0:
+                        gen = (pair[j][k] + mod) % 10
+                        s[gen] += cpair[j][k]
+                        tmpair[j][gen] += cpair[j][k]
+                        tmpair[gen][k] += cpair[j][k]
+            cpair = tmpair
+        results.append(str(tot))
+    return results
 
-        # Iterate over pairs of digits in the colony
-        for i in range(len(colony_digits) - 1):
-            digit1 = colony_digits[i]
-            digit2 = colony_digits[i + 1]
-
-            # Calculate the signature of the pair
-            signature = 0
-            if digit1 != digit2:
-                diff = digit1 - digit2
-                signature = 10 + diff if diff < 0 else diff
-
-            # Calculate the sum of weight and signature
-            digit_sum = currentGenWeight + signature
-
-            # Append the last digit of the sum to the new colony
-            if (i == 0):
-                new_colony.append(digit1)
-            new_colony.append(digit_sum % 10)
-            new_colony.append(digit2)
-
-        # Update the colony digits with the new colony
-        colony_digits = new_colony
-
-    # Calculate the weight of the final colony
-    finalcolonyWeight = sum(colony_digits)
-
-    return str(finalcolonyWeight)
 
 # Airport CheckIn Solutions
 
@@ -329,11 +324,7 @@ def digital_colony():
     data = request.get_json()
     logging.info("data sent for evaluation {}".format(data))
 
-    results = []
-    for item in data:
-        weight = calculateWeightOverGeneration(item)
-        results.append(weight)
-
+    results = calculateWeightOverGeneration(data)
     return json.dumps(results)
 
 
