@@ -213,11 +213,49 @@ class Passenger:
 
 
 def prioritizeQueue(listPassengers, cutoff_time):
-  # print('list: ', listPassengers)
-  sortedPassengers = [passenger for passenger in listPassengers if passenger.askTimeToDeparture() >= cutoff_time]
-  sortedPassengers = sorted(sortedPassengers, key=lambda passenger: passenger.departureTime)
-  # print('listAfter: ', sortedPassengers)
-  return sortedPassengers
+    # print('list: ', listPassengers)
+    sortedPassengers = [passenger for passenger in listPassengers if passenger.askTimeToDeparture() >= cutoff_time]
+    sortedPassengers = sorted(sortedPassengers, key=lambda passenger: passenger.askTimeToDeparture())
+    # print('listAfter: ', sortedPassengers)
+    return sortedPassengers
+
+# def prioritizeQueue(listPassengers, cut_off_time):
+#     if len(listPassengers) <= 1:
+#         if(listPassengers[0].askTimeToDeparture() < cut_off_time ):
+#             return []
+#         else:
+#             return listPassengers
+
+#     # Divide the array into two halves
+#     mid = len(listPassengers) // 2
+#     left_half = listPassengers[:mid]
+#     right_half = listPassengers[mid:]
+
+#     # Recursively sort the two halves
+#     left_sorted = merge_sort(left_half)
+#     right_sorted = merge_sort(right_half)
+
+#     # Merge the sorted halves
+#     return merge(left_sorted, right_sorted)
+
+# def merge(left, right):
+#     sortedPassengers = []
+#     left_index = right_index = 0
+
+#     # Compare elements from both halves and merge them in sorted order
+#     while left_index < len(left) and right_index < len(right):
+#         if left[left_index].askTimeToDeparture() <= right[right_index].askTimeToDeparture():
+#             sortedPassengers.append(left[left_index])
+#             left_index += 1
+#         else:
+#             sortedPassengers.append(right[right_index])
+#             right_index += 1
+
+#     # Append the remaining elements from the unfinished half
+#     sortedPassengers.extend(left[left_index:])
+#     sortedPassengers.extend(right[right_index:])
+
+#     return sortedPassengers
 
 
 def execute(passenger_data, cut_off_time):
