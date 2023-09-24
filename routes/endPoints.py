@@ -2,6 +2,7 @@ import logging
 import socket
 from routes import app
 from flask import Flask, request, jsonify, json
+import math
 from typing import Dict, List
 from functools import lru_cache
 
@@ -199,68 +200,64 @@ def calculateWeightOverGeneration(data):
 # Airport CheckIn Solutions
 
 class Passenger:
+  def __init__(self, departureTime):
+    self.departureTime = departureTime
+    self.numberOfRequests = 0
 
-    def __init__(self, departureTime):
-        self.departureTime = departureTime
-        self.numberOfRequests = 0
+  def askTimeToDeparture(self):
+    self.numberOfRequests += 1
+    return self.departureTime
 
-    def askTimeToDeparture(self):
-        self.numberOfRequests += 1
-        return self.departureTime
-
-    def getNumberOfRequests(self):
-        return self.numberOfRequests
+  def getNumberOfRequests(self):
+    return self.numberOfRequests
 
 
 def prioritizeQueue(listPassengers, cutoff_time):
-    # print('list: ', listPassengers)
-    sortedPassengers = [
-        passenger for passenger in listPassengers if passenger.askTimeToDeparture() <= cutoff_time]
-    sortedPassengers = sorted(
-        sortedPassengers, key=lambda passenger: passenger.departureTime)
-    # print('listAfter: ', sortedPassengers)
-    return sortedPassengers
+  # print('list: ', listPassengers)
+  sortedPassengers = [passenger for passenger in listPassengers if passenger.askTimeToDeparture() >= cutoff_time]
+  sortedPassengers = sorted(sortedPassengers, key=lambda passenger: passenger.departureTime)
+  # print('listAfter: ', sortedPassengers)
+  return sortedPassengers
 
 
 def execute(passenger_data, cut_off_time):
-    totalNumberOfRequests = 0
-    passengers = []
+  totalNumberOfRequests = 0
+  passengers = []
 
-    # Initialise list of passenger instances
-    for i in range(len(passenger_data)):
-        passengers.append(Passenger(passenger_data[i]))
+  # Initialise list of passenger instances
+  for i in range(len(passenger_data)):
+    passengers.append(Passenger(passenger_data[i]))
 
-    # Apply solution and re-shuffle with departure cut-off time
-    prioritised_and_filtered_passengers = prioritizeQueue(
-        passengers, cut_off_time)
+  # Apply solution and re-shuffle with departure cut-off time
+  prioritised_and_filtered_passengers = prioritizeQueue(passengers, cut_off_time)
 
-    # Sum totalNumberOfRequests across all passengers
-    for i in range(len(passengers)):
-        totalNumberOfRequests += passengers[i].getNumberOfRequests()
-    print("totalNumberOfRequests: " + str(totalNumberOfRequests))
+  # Sum totalNumberOfRequests across all passengers
+  for i in range(len(passengers)):
+    totalNumberOfRequests += passengers[i].getNumberOfRequests()
 
-    # Print sequence of sorted departure times
-    print("Sequence of prioritised departure times:")
-    prioritised_filtered_list = []
-    for i in range(len(prioritised_and_filtered_passengers)):
-        print(prioritised_and_filtered_passengers[i].departureTime, end=" ")
-        prioritised_filtered_list.append(
-            prioritised_and_filtered_passengers[i].departureTime)
+  print("totalNumberOfRequests: " + str(totalNumberOfRequests))
 
-    print("\n")
-    return {
-        "total_number_of_requests": totalNumberOfRequests,
-        "prioritised_filtered_list": prioritised_filtered_list
-    }
+  # Print sequence of sorted departure times
+  print("Sequence of prioritised departure times:")
+  prioritised_filtered_list = []
+  for i in range(len(prioritised_and_filtered_passengers)):
+    print(prioritised_and_filtered_passengers[i].departureTime, end=" ")
+    prioritised_filtered_list.append(prioritised_and_filtered_passengers[i].departureTime)
+
+  print("\n")
+  return {
+    "total_number_of_requests": totalNumberOfRequests,
+    "prioritised_filtered_list": prioritised_filtered_list
+  }
 
 
 def arrangeCheckIn(testCase):
-    result = execute(testCase["departureTimes"], testCase["cutOffTime"])
-    return {
-        "id": testCase['id'],
-        "sortedDepartureTimes": result['prioritised_filtered_list'],
-        "numberOfRequests": result['total_number_of_requests']
-    }
+  result = execute(testCase["departureTimes"], testCase["cutOffTime"])
+  return {
+    "id": testCase['id'],
+    "sortedDepartureTimes": result['prioritised_filtered_list'],
+    "numberOfRequests": result['total_number_of_requests']
+  }
 
 # Calendar Scheduling Solution
 
@@ -327,17 +324,34 @@ def digital_colony():
     results = calculateWeightOverGeneration(data)
     return json.dumps(results)
 
+@app.route('/chinese-wall', methods=['GET'])
+def chinese_wall():
+  listPassword = {
+    "1": "Fluffy",
+    "2": "Galactic",
+    "3": "Mangoes",
+    "4": "Subatomic",
+    "5": "Guitar"
+  }
+
+  return jsonify(listPassword)
+  
 
 @app.route('/airport', methods=['POST'])
 def airport_checkin():
-    data = request.get_json()
+  data = request.get_json()
+  logging.info("data sent for evaluation {}".format(data))
 
-    results = []
-    for item in data:
-        arrangedCheckIn = arrangeCheckIn(item)
-        results.append(arrangedCheckIn)
+  results = []
+  for item in data:
+      arrangedCheckIn = arrangeCheckIn(item)
+      results.append(arrangedCheckIn)
 
-    return json.dumps(results)
+  #return json.dumps(results)
+  response = jsonify(results)
+  response.headers['Content-Type'] = 'application/json'  # Set the content type header
+
+  return response
 
 @app.route('/maze', methods=['POST'])
 def maze():
@@ -365,3 +379,58 @@ def move(data):
         dir = (dir + 2) % 4
     action = new_arr[dir]
     return {"playerAction": action}
+
+    return {"playerAction": "stay"}
+
+@app.route('/pie-chart', methods=['POST'])
+def calculate_pie_chart():
+    data = request.get_json()
+    logging.info("data sent for evaluation {}".format(data))
+    results = processCalculationRadians(data['data'])
+    return jsonify(results)
+
+def calculate_radians(portfolio):
+    total_investment = sum(portfolio)
+    proportions = [investment / total_investment for investment in portfolio]
+
+    min_proportion_radians = 0.00314159  # Minimum radians for instruments with small proportions
+    min_proportion = 0.05/100
+    total_radians = 2 * math.pi
+
+    radians = []
+    total_adjustment_diff = 0
+    total_unadjusted_investment = 0
+    for proportion in proportions:
+        if proportion < min_proportion:
+            radians.append(min_proportion_radians)
+            total_adjustment_diff += (min_proportion_radians-proportion*total_radians)
+        else:
+            radians.append(proportion * total_radians)
+            total_unadjusted_investment += (proportion * total_radians)
+
+    #radians = [min_proportion_radians if proportion < min_proportion else proportion * total_radians for proportion in proportions]
+    
+     # Calculate radians for each instrument, adjusting for small proportions
+    if(total_adjustment_diff):
+        for radian in radians:
+            if(radian > min_proportion_radians):
+                radian -= (total_adjustment_diff * radian/total_unadjusted_investment)
+
+    # Sort instruments and calculate boundaries
+    #sorted_instruments = sorted(zip(portfolio, radians), key=lambda x: x[0]['investment'], reverse=True)
+    radians.sort(reverse=True)
+    boundaries = [0.0]
+    accumulated_radians = 0.0
+
+    for radian in radians:
+        accumulated_radians += radian
+        boundaries.append(round(accumulated_radians, 7))
+
+    return boundaries
+
+def processCalculationRadians(portfolio):
+    listInvestmentAmount = [instrument['quantity']*instrument['price'] for instrument in portfolio]
+    radianResult = calculate_radians(listInvestmentAmount)
+    return {
+        "instruments": radianResult
+    }
