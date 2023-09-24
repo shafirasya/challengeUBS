@@ -10,6 +10,13 @@ from routes import app
 
 logger = logging.getLogger(__name__)
 
+arr = {
+    0: (0, 1), 1: (1, 2), 2: (2, 1), 3: (1, 0)}
+new_arr = {
+    0: "up", 1: "right", 2: "down", 3: "left"
+}
+dir = 2
+
 @app.route('/lazy-developer', methods=['POST'])
 def evaluateLazyDeveloper():
     data = request.get_json()
@@ -362,12 +369,7 @@ def maze():
     return jsonify(result)
 
 def move(data):
-    global arr = {
-        0: (0, 1), 1: (1, 2), 2: (2, 1), 3: (1, 0)}
-    global new_arr = {
-        0: "up", 1: "right", 2: "down", 3: "left"
-    }
-    global dir = 2
+    global arr, dir, new_arr
     nearby = data['nearby']
     if nearby[arr[(dir + 1) % 4][0]][arr[(dir + 1) % 4][1]] != 0:
         dir = (dir + 1) % 4
