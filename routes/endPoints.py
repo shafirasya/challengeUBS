@@ -10,6 +10,13 @@ from routes import app
 
 logger = logging.getLogger(__name__)
 
+arr = {
+    0: (0, 1), 1: (1, 2), 2: (2, 1), 3: (1, 0)}
+new_arr = {
+    0: "up", 1: "right", 2: "down", 3: "left"
+}
+dir = 2
+
 @app.route('/lazy-developer', methods=['POST'])
 def evaluateLazyDeveloper():
     data = request.get_json()
@@ -65,23 +72,19 @@ def evaluateGreedyMonkey():
 
 def calculate_maximum_value(weight_limit, value_limit, items):
     memo = {}
-
-    def dynamic_programming(curr_weight, curr_value, index):
+    def dp(curr_weight, curr_value, index):
         if index == len(items):
             return 0
-
         if (curr_weight, curr_value, index) in memo:
             return memo[(curr_weight, curr_value, index)]
-
         max_value = 0
         if curr_weight + items[index][0] <= weight_limit and curr_value + items[index][1] <= value_limit:
-            max_value = max(max_value, items[index][2] + dynamic_programming(curr_weight + items[index][0], curr_value + items[index][1], index + 1))
-        max_value = max(max_value, dynamic_programming(curr_weight, curr_value, index + 1))
+            max_value = max(max_value, items[index][2] + dp(curr_weight + items[index][0], curr_value + items[index][1], index + 1))
+        max_value = max(max_value, dp(curr_weight, curr_value, index + 1))
 
         memo[(curr_weight, curr_value, index)] = max_value
         return max_value
-
-    return dynamic_programming(0, 0, 0)
+    return dp(0, 0, 0)
 
 @app.route("/railway-builder", methods=['POST'])
 def railway_builder():
@@ -400,12 +403,7 @@ def maze():
     return jsonify(result)
 
 def move(data):
-    arr = {
-        0: (0, 1), 1: (1, 2), 2: (2, 1), 3: (1, 0)}
-    new_arr = {
-        0: "up", 1: "right", 2: "down", 3: "left"
-    }
-    dir = 2
+    global arr, dir, new_arr
     nearby = data['nearby']
     if nearby[arr[(dir + 1) % 4][0]][arr[(dir + 1) % 4][1]] != 0:
         dir = (dir + 1) % 4
